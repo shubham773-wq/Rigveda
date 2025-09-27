@@ -1,646 +1,430 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rig Veda Explorer</title>
-    <style>
-        :root {
-            --primary: #8B4513;
-            --secondary: #D2691E;
-            --accent: #F4A460;
-            --light: #F5F5DC;
-            --dark: #2F4F4F;
-            --text: #333;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Georgia', serif;
-        }
-        
-        body {
-            background-color: var(--light);
-            color: var(--text);
-            line-height: 1.6;
-        }
-        
-        header {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-        
-        .tab-container {
-            display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--accent);
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab.active {
-            border-bottom: 3px solid var(--primary);
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .tab:hover {
-            background-color: rgba(139, 69, 19, 0.1);
-        }
-        
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-        }
-        
-        /* Remove any flip card styles that might be causing issues */
-        .flip-card, .flip-card-inner, .flip-card-front, .flip-card-back {
-            transform-style: preserve-3d;
-            transition: none !important;
-        }
-        
-        .mandala-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .mandala-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .mandala-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-        
-        .mandala-title {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .mandala-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-        
-        .visualization-container {
-            height: 500px;
-            width: 100%;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        
-        .search-box {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-        }
-        
-        .deity-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border-left: 3px solid var(--secondary);
-        }
-        
-        .deity-name {
-            font-weight: bold;
-            color: var(--secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .hymn-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 1rem;
-        }
-        
-        .hymn-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        
-        .hymn-item:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .hymn-detail {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            display: none;
-        }
-        
-        .hymn-detail.active {
-            display: block;
-        }
-        
-        .mantra-text {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-        
-        .translation {
-            color: var(--dark);
-            border-left: 3px solid var(--accent);
-            padding-left: 1rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            background-color: var(--dark);
-            color: white;
-            margin-top: 3rem;
-        }
-        
-        .source-info {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 1rem;
-        }
-        
-        @media (max-width: 768px) {
-            .mandala-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab {
-                padding: 0.8rem 1rem;
-                font-size: 1rem;
-            }
-            
-            .visualization-container {
-                height: 400px;
-            }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rig Veda Mandala Explorer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: #f8f9fa;
+    color: #333;
+  }
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    background: #4a90e2;
+    color: white;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: 1.5px;
+  }
+  #mandala-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(100px,1fr));
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .mandala-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.2rem 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #4a90e2;
+    box-shadow: 0 4px 8px rgba(74,144,226,0.15);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+  .mandala-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(74,144,226,0.3);
+  }
+  #search-bar {
+    max-width: 600px;
+    margin: 1rem auto 2rem;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+  #search-input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 2px solid #4a90e2;
+    border-radius: 30px;
+    font-size: 1rem;
+    transition: box-shadow 0.3s ease;
+  }
+  #search-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #4a90e2;
+  }
+  #search-button {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #search-button:hover {
+    background: #2f67c0;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    padding: 0 1rem;
+  }
+  #mandala-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a90e2;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .sukta {
+    background: white;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .sukta-header {
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    background: #e6f2ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sukta-verse-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .sukta-verse-list.open {
+    max-height: 600px;
+  }
+  .verse {
+    padding: 0.75rem 1.5rem;
+    border-top: 1px solid #ddd;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .verse em {
+    display: block;
+    margin-top: 0.3rem;
+    color: #777;
+    font-style: normal;
+    font-size: 0.85rem;
+  }
+  #search-results {
+    max-width: 900px;
+    margin: 1rem auto 3rem;
+    padding: 1rem;
+    background: #ffffffcc;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+  }
+  .search-result-item {
+    margin-bottom: 1rem;
+  }
+  .search-result-item strong {
+    color: #4a90e2;
+  }
+  footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: #555;
+    border-top: 1px solid #ddd;
+    background: #f0f2f5;
+  }
+  a {
+    color: #4a90e2;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .mandala-card {
+      font-size: 1rem;
+      padding: 1rem 0;
+    }
+  }
+
+  /* Fade-in animation */
+  .fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    } to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Arrow icon for accordion */
+  .arrow {
+    border: solid #4a90e2;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 5px;
+    transition: transform 0.4s ease;
+    margin-left: 10px;
+  }
+  .down {
+    transform: rotate(45deg);
+  }
+  .right {
+    transform: rotate(-45deg);
+  }
+</style>
 </head>
 <body>
-    <header>
-        <h1>Rig Veda Explorer</h1>
-        <p class="subtitle">An interactive journey through the ancient hymns of wisdom</p>
-    </header>
-    
-    <div class="container">
-        <div class="tab-container">
-            <button class="tab active" data-tab="overview">Overview</button>
-            <button class="tab" data-tab="mandalas">Mandalas</button>
-            <button class="tab" data-tab="deities">Deities</button>
-            <button class="tab" data-tab="explore">Mantra Explorer</button>
-        </div>
-        
-        <div id="overview" class="tab-content active">
-            <div class="card">
-                <h2>Welcome to the Rig Veda Explorer</h2>
-                <p>The Rig Veda is the oldest of the four Vedas, a collection of ancient Sanskrit hymns composed between 1500 and 1000 BCE. It consists of 1,028 hymns (sūktas) organized into ten books (maṇḍalas).</p>
-                <p>This interactive visualization helps you explore the structure, themes, and deities of the Rig Veda in an engaging way.</p>
-            </div>
-            
-            <div class="card">
-                <h3>Quick Statistics</h3>
-                <div class="mandala-grid">
-                    <div class="mandala-card">
-                        <div class="mandala-title">Total Hymns</div>
-                        <div class="mandala-stats">
-                            <span>1,028 hymns</span>
-                        </div>
-                    </div>
-                    <div class="mandala-card">
-                        <div class="mandala-title">Total Verses</div>
-                        <div class="mandala-stats">
-                            <span>10,552 verses</span>
-                        </div>
-                    </div>
-                    <div class="mandala-card">
-                        <div class="mandala-title">Main Deities</div>
-                        <div class="mandala-stats">
-                            <span>33 principal deities</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>Deity Network</h3>
-                <p>This visualization shows the relationships between different deities in the Rig Veda based on how often they appear together in hymns.</p>
-                <div class="visualization-container" id="deity-network">
-                    <!-- D3.js visualization will be rendered here -->
-                </div>
-            </div>
-        </div>
-        
-        <div id="mandalas" class="tab-content">
-            <div class="card">
-                <h2>Explore by Mandala</h2>
-                <p>The Rig Veda is organized into 10 Mandalas (books). Each Mandala has a distinct character and was composed by different families of sages.</p>
-            </div>
-            
-            <div class="mandala-grid" id="mandala-container">
-                <!-- Mandala cards will be dynamically generated -->
-            </div>
-        </div>
-        
-        <div id="deities" class="tab-content">
-            <div class="card">
-                <h2>Deities of the Rig Veda</h2>
-                <p>The Rig Veda praises various deities representing natural forces, cosmic principles, and abstract concepts.</p>
-                <input type="text" class="search-box" id="deity-search" placeholder="Search for a deity...">
-            </div>
-            
-            <div id="deity-container">
-                <!-- Deity cards will be dynamically generated -->
-            </div>
-        </div>
-        
-        <div id="explore" class="tab-content">
-            <div class="card">
-                <h2>Mantra Explorer</h2>
-                <p>Browse and read hymns from the Rig Veda. Select a Mandala and Hymn to explore its content.</p>
-                
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <select id="mandala-select" style="flex: 1; padding: 0.5rem;">
-                        <option value="">Select Mandala</option>
-                        <!-- Options will be dynamically generated -->
-                    </select>
-                    
-                    <select id="hymn-select" style="flex: 1; padding: 0.5rem;">
-                        <option value="">Select Hymn</option>
-                    </select>
-                </div>
-                
-                <div class="hymn-detail" id="hymn-detail">
-                    <!-- Hymn details will be displayed here -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <footer>
-        <p>Rig Veda Explorer - Created for educational purposes</p>
-        <p class="source-info">Data sourced from public domain translations and academic resources</p>
-    </footer>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script>
-        // Sample data for the Rig Veda
-        const rigVedaData = {
-            mandalas: [
-                { id: 1, name: "Mandala 1", hymns: 191, verses: 2006, rishi: "Various", description: "Contains hymns to Agni, Indra, and other deities. Mostly composed by the Kanva and Angiras families." },
-                { id: 2, name: "Mandala 2", hymns: 43, verses: 429, rishi: "Gṛtsamada Śaunahotra", description: "Dedicated mainly to Agni and Indra. Composed by the Gṛtsamada family." },
-                { id: 3, name: "Mandala 3", hymns: 62, verses: 617, rishi: "Viśvāmitra Gāthina", description: "Features the famous Gayatri Mantra. Composed by the Viśvāmitra family." },
-                { id: 4, name: "Mandala 4", hymns: 58, verses: 589, rishi: "Vāmadeva Gautama", description: "Contains hymns to Agni and Indra. Composed by the Vāmadeva family." },
-                { id: 5, name: "Mandala 5", hymns: 87, verses: 727, rishi: "Atri Bhauma", description: "Dedicated to the Atri family. Features hymns to various deities." },
-                { id: 6, name: "Mandala 6", hymns: 75, verses: 765, rishi: "Bharadvāja Bārhaspatya", description: "Composed by the Bharadvāja family. Contains hymns to Indra and Agni." },
-                { id: 7, name: "Mandala 7", hymns: 104, verses: 841, rishi: "Vasiṣṭha Maitrāvaruṇi", description: "Composed by the Vasiṣṭha family. Contains hymns to various deities." },
-                { id: 8, name: "Mandala 8", hymns: 103, verses: 1716, rishi: "Kaṇva family", description: "A collection of hymns by the Kaṇva family. Contains diverse content." },
-                { id: 9, name: "Mandala 9", hymns: 114, verses: 1108, rishi: "Various", description: "Dedicated entirely to Soma Pavamāna, the personification of the sacred Soma plant." },
-                { id: 10, name: "Mandala 10", hymns: 191, verses: 1754, rishi: "Various", description: "The youngest book, containing philosophical hymns including the famous Nāsadīya Sūkta (Creation Hymn)." }
-            ],
-            deities: [
-                { name: "Agni", hymns: 200, description: "God of fire, messenger between gods and humans" },
-                { name: "Indra", hymns: 250, description: "King of gods, god of weather and war" },
-                { name: "Soma", hymns: 123, description: "God of the sacred plant and ritual drink" },
-                { name: "Varuna", hymns: 46, description: "God of cosmic order, waters, and law" },
-                { name: "Mitra", hymns: 12, description: "God of friendship and contracts" },
-                { name: "Ushas", hymns: 20, description: "Goddess of dawn" },
-                { name: "Ashvins", hymns: 56, description: "Twin gods of medicine and healing" },
-                { name: "Maruts", hymns: 33, description: "Storm gods, companions of Indra" },
-                { name: "Vayu", hymns: 12, description: "God of wind" },
-                { name: "Surya", hymns: 10, description: "Sun god" },
-                { name: "Vishnu", hymns: 6, description: "God associated with cosmic order" },
-                { name: "Rudra", hymns: 5, description: "A form of Shiva, god of storms and hunt" },
-                { name: "Brihaspati", hymns: 11, description: "God of prayer and devotion" },
-                { name: "Aditi", hymns: 8, description: "Goddess of the infinite, mother of gods" },
-                { name: "Saraswati", hymns: 3, description: "Goddess of knowledge, music, and arts" }
-            ],
-            hymns: {
-                1: {
-                    1: {
-                        title: "To Agni",
-                        mantra: "अग्निमीळे पुरोहितं यज्ञस्य देवमृत्विजम्। होतारं रत्नधातमम्॥",
-                        translation: "I praise Agni, the chosen Priest, God, minister of sacrifice, The hotar, lavishest of wealth."
-                    },
-                    50: {
-                        title: "To Ushas",
-                        mantra: "उषो देवीरमृतं वहन्तीर्हस्तैर्दधाना अमृतस्य नाम।",
-                        translation: "The Dawns, the goddesses, bring immortality, bearing the name of immortality in their hands."
-                    }
-                },
-                10: {
-                    129: {
-                        title: "The Creation Hymn (Nāsadīya Sūkta)",
-                        mantra: "नासदासीन्नो सदासीत्तदानीं नासीद्रजो नो व्योमा परो यत्।",
-                        translation: "Then there was neither existence nor non-existence, Neither the realm of space, nor the sky which is beyond."
-                    },
-                    90: {
-                        title: "The Purusha Sukta",
-                        mantra: "सहस्रशीर्षा पुरुषः सहस्राक्षः सहस्रपात्।",
-                        translation: "The Purusha has a thousand heads, a thousand eyes, a thousand feet."
-                    }
-                }
-            }
-        };
+<header>
+  <h1>Rig Veda Mandala Explorer</h1>
+</header>
 
-        // Tab switching functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and contents
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
+<section id="search-bar">
+  <input type="text" id="search-input" placeholder="Search hymns, verses, or deities..." />
+  <button id="search-button">Search</button>
+</section>
+
+<section id="mandala-grid" aria-label="Select a Mandala to explore">
+  <!-- Filled by JS -->
+</section>
+
+<main>
+  <h2 id="mandala-title"></h2>
+  <div id="mandala-details" aria-live="polite">
+    <!-- Mandala details go here -->
+  </div>
+</main>
+
+<section id="search-results" aria-live="polite" hidden>
+  <!-- Search results go here -->
+</section>
+
+<footer>
+  All Rig Veda Samhita content sourced from
+  <a href="https://vedicheritage.gov.in/samhitas/rigveda/" target="_blank" rel="noopener noreferrer">
+    vedicheritage.gov.in
+  </a>.
+</footer>
+
+<script>
+  // Sample data for Mandalas 1-3 (Include all Mandalas 1–10 for full site)
+  const rigvedaData = [
+    {
+      mandala: 1,
+      suktas: [
+        {
+          number: 1,
+          title: "Agni Sukta",
+          verses: [
+            { number: 1, text: "Agni, be kindled here, worthy to be praised.", deities: ["Agni"] },
+            { number: 2, text: "Agni, protector of all life and sacrifice.", deities: ["Agni"] }
+          ]
+        },
+        {
+          number: 2,
+          title: "Bhṛgu Sukta",
+          verses: [
+            { number: 1, text: "We invoke the Sage Bhrigu...", deities: ["Bhrigu"] }
+          ]
+        }
+      ]
+    },
+    {
+      mandala: 2,
+      suktas: [
+        {
+          number: 1,
+          title: "Dyaus Sukta",
+          verses: [
+            { number: 1, text: "Heaven and Earth sustain us.", deities: ["Dyaus"] }
+          ]
+        }
+      ]
+    },
+    {
+      mandala: 3,
+      suktas: [
+        {
+          number: 1,
+          title: "Indra Sukta",
+          verses: [
+            { number: 1, text: "Hail to Indra, the king of gods!", deities: ["Indra"] },
+            { number: 2, text: "Indra, wielder of the thunderbolt and the earth-shaker.", deities: ["Indra"] }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const mandalaGrid = document.getElementById('mandala-grid');
+  const mandalaTitle = document.getElementById('mandala-title');
+  const mandalaDetails = document.getElementById('mandala-details');
+  const searchInput = document.getElementById('search-input');
+  const searchButton = document.getElementById('search-button');
+  const searchResultsSection = document.getElementById('search-results');
+
+  // Build Mandala selection grid
+  rigvedaData.forEach(mandala => {
+    const card = document.createElement('div');
+    card.textContent = `Mandala ${mandala.mandala}`;
+    card.className = 'mandala-card fade-in';
+    card.style.animationDelay = (mandala.mandala * 0.1) + 's';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-pressed', 'false');
+    card.addEventListener('click', () => selectMandala(mandala.mandala));
+    card.addEventListener('keypress', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        selectMandala(mandala.mandala);
+      }
+    });
+    mandalaGrid.appendChild(card);
+  });
+
+  let currentOpenSukta = null;
+
+  function selectMandala(num) {
+    const mandala = rigvedaData.find(m => m.mandala === num);
+    if (!mandala) return;
+
+    searchResultsSection.hidden = true;
+    mandalaTitle.textContent = `Mandala ${mandala.mandala}`;
+    mandalaDetails.innerHTML = '';
+
+    mandala.suktas.forEach(sukta => {
+      const suktaDiv = document.createElement('div');
+      suktaDiv.className = 'sukta';
+
+      const header = document.createElement('div');
+      header.className = 'sukta-header';
+      header.textContent = `Sukta ${sukta.number}: ${sukta.title}`;
+
+      // arrow icon
+      const arrow = document.createElement('i');
+      arrow.className = 'arrow right';
+      header.appendChild(arrow);
+
+      header.addEventListener('click', () => {
+        const list = suktaDiv.querySelector('.sukta-verse-list');
+        if (list.classList.contains('open')) {
+          list.classList.remove('open');
+          arrow.classList.replace('down', 'right');
+          currentOpenSukta = null;
+        } else {
+          // close previous open
+          if (currentOpenSukta && currentOpenSukta !== list) {
+            currentOpenSukta.classList.remove('open');
+            const prevArrow = currentOpenSukta.parentNode.querySelector('.arrow');
+            prevArrow.classList.replace('down', 'right');
+          }
+          list.classList.add('open');
+          arrow.classList.replace('right', 'down');
+          currentOpenSukta = list;
+        }
+      });
+
+      suktaDiv.appendChild(header);
+
+      const versesList = document.createElement('ol');
+      versesList.className = 'sukta-verse-list';
+      sukta.verses.forEach(verse => {
+        const verseLi = document.createElement('li');
+        verseLi.className = 'verse';
+        verseLi.innerHTML = `${verse.text} <em>Deities: ${verse.deities.join(', ')}</em>`;
+        versesList.appendChild(verseLi);
+      });
+
+      suktaDiv.appendChild(versesList);
+
+      mandalaDetails.appendChild(suktaDiv);
+    });
+  }
+
+  function searchVerses(query) {
+    if (!query.trim()) return [];
+
+    const q = query.toLowerCase();
+    const results = [];
+
+    rigvedaData.forEach(mandala => {
+      mandala.suktas.forEach(sukta => {
+        sukta.verses.forEach(verse => {
+          if (
+            verse.text.toLowerCase().includes(q) ||
+            verse.deities.some(d => d.toLowerCase().includes(q))
+          ) {
+            results.push({
+              mandala: mandala.mandala,
+              sukta: sukta.number,
+              verse: verse.number,
+              text: verse.text,
+              deities: verse.deities
             });
+          }
         });
+      });
+    });
+    return results;
+  }
 
-        // Initialize Mandala view
-        function initMandalas() {
-            const container = document.getElementById('mandala-container');
-            container.innerHTML = '';
-            
-            rigVedaData.mandalas.forEach(mandala => {
-                const card = document.createElement('div');
-                card.className = 'mandala-card';
-                card.innerHTML = `
-                    <div class="mandala-title">${mandala.name}</div>
-                    <p>${mandala.description}</p>
-                    <div class="mandala-stats">
-                        <span>${mandala.hymns} hymns</span>
-                        <span>${mandala.verses} verses</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+  searchButton.addEventListener('click', () => {
+    const query = searchInput.value;
+    const results = searchVerses(query);
 
-        // Initialize Deities view
-        function initDeities() {
-            const container = document.getElementById('deity-container');
-            container.innerHTML = '';
-            
-            rigVedaData.deities.forEach(deity => {
-                const card = document.createElement('div');
-                card.className = 'deity-card';
-                card.innerHTML = `
-                    <div class="deity-name">${deity.name}</div>
-                    <p>${deity.description}</p>
-                    <div>Mentioned in ${deity.hymns} hymns</div>
-                `;
-                container.appendChild(card);
-            });
-            
-            // Add search functionality
-            document.getElementById('deity-search').addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                document.querySelectorAll('.deity-card').forEach(card => {
-                    const deityName = card.querySelector('.deity-name').textContent.toLowerCase();
-                    if (deityName.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        }
+    if (!results.length) {
+      searchResultsSection.hidden = true;
+      alert('No results found for: ' + query);
+      return;
+    }
 
-        // Initialize Mantra Explorer
-        function initMantraExplorer() {
-            const mandalaSelect = document.getElementById('mandala-select');
-            const hymnSelect = document.getElementById('hymn-select');
-            const hymnDetail = document.getElementById('hymn-detail');
-            
-            // Populate mandala select
-            rigVedaData.mandalas.forEach(mandala => {
-                const option = document.createElement('option');
-                option.value = mandala.id;
-                option.textContent = mandala.name;
-                mandalaSelect.appendChild(option);
-            });
-            
-            // Update hymn select when mandala is selected
-            mandalaSelect.addEventListener('change', function() {
-                hymnSelect.innerHTML = '<option value="">Select Hymn</option>';
-                hymnDetail.classList.remove('active');
-                
-                const mandalaId = this.value;
-                if (mandalaId && rigVedaData.hymns[mandalaId]) {
-                    Object.keys(rigVedaData.hymns[mandalaId]).forEach(hymnId => {
-                        const hymn = rigVedaData.hymns[mandalaId][hymnId];
-                        const option = document.createElement('option');
-                        option.value = hymnId;
-                        option.textContent = `Hymn ${hymnId}: ${hymn.title}`;
-                        hymnSelect.appendChild(option);
-                    });
-                }
-            });
-            
-            // Display hymn when selected
-            hymnSelect.addEventListener('change', function() {
-                const mandalaId = mandalaSelect.value;
-                const hymnId = this.value;
-                
-                if (mandalaId && hymnId && rigVedaData.hymns[mandalaId] && rigVedaData.hymns[mandalaId][hymnId]) {
-                    const hymn = rigVedaData.hymns[mandalaId][hymnId];
-                    hymnDetail.innerHTML = `
-                        <h3>${hymn.title}</h3>
-                        <div class="mantra-text">${hymn.mantra}</div>
-                        <div class="translation">${hymn.translation}</div>
-                    `;
-                    hymnDetail.classList.add('active');
-                } else {
-                    hymnDetail.classList.remove('active');
-                }
-            });
-        }
+    searchResultsSection.innerHTML = `<h3>Search Results (${results.length})</h3>` + 
+      results.map(res => `
+        <div class="search-result-item">
+          <strong>Mandala ${res.mandala}, Sukta ${res.sukta}, Verse ${res.verse}</strong><br/>
+          ${res.text}<br/>
+          <em>Deities: ${res.deities.join(', ')}</em>
+        </div>
+      `).join('');
+    searchResultsSection.hidden = false;
 
-        // Create deity network visualization
-        function createDeityNetwork() {
-            const width = document.getElementById('deity-network').clientWidth;
-            const height = 500;
-            
-            // Clear previous visualization
-            d3.select("#deity-network").selectAll("*").remove();
-            
-            const svg = d3.select("#deity-network")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height);
-            
-            // Sample deity connections data
-            const deityConnections = [
-                { source: "Agni", target: "Indra", strength: 0.8 },
-                { source: "Agni", target: "Soma", strength: 0.6 },
-                { source: "Indra", target: "Soma", strength: 0.7 },
-                { source: "Indra", target: "Maruts", strength: 0.9 },
-                { source: "Varuna", target: "Mitra", strength: 0.8 },
-                { source: "Ushas", target: "Surya", strength: 0.5 },
-                { source: "Ashvins", target: "Ushas", strength: 0.4 },
-                { source: "Vishnu", target: "Indra", strength: 0.3 },
-                { source: "Rudra", target: "Maruts", strength: 0.6 },
-                { source: "Brihaspati", target: "Agni", strength: 0.5 }
-            ];
-            
-            // Create nodes from deities
-            const nodes = rigVedaData.deities.map(d => ({ id: d.name, group: 1, hymns: d.hymns }));
-            
-            // Create force simulation
-            const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(deityConnections).id(d => d.id).distance(100))
-                .force("charge", d3.forceManyBody().strength(-50))
-                .force("center", d3.forceCenter(width / 2, height / 2));
-            
-            // Create links
-            const link = svg.append("g")
-                .selectAll("line")
-                .data(deityConnections)
-                .enter().append("line")
-                .attr("stroke", "#999")
-                .attr("stroke-opacity", 0.6)
-                .attr("stroke-width", d => d.strength * 3);
-            
-            // Create nodes
-            const node = svg.append("g")
-                .selectAll("circle")
-                .data(nodes)
-                .enter().append("circle")
-                .attr("r", d => 5 + (d.hymns / 50))
-                .attr("fill", d => d3.schemeCategory10[0])
-                .call(d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended));
-            
-            // Add labels
-            const label = svg.append("g")
-                .selectAll("text")
-                .data(nodes)
-                .enter().append("text")
-                .text(d => d.id)
-                .attr("font-size", 12)
-                .attr("dx", 10)
-                .attr("dy", 4);
-            
-            // Update positions on each tick
-            simulation.on("tick", () => {
-                link
-                    .attr("x1", d => d.source.x)
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
-                
-                node
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
-                
-                label
-                    .attr("x", d => d.x)
-                    .attr("y", d => d.y);
-            });
-            
-            // Drag functions
-            function dragstarted(event, d) {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-            
-            function dragged(event, d) {
-                d.fx = event.x;
-                d.fy = event.y;
-            }
-            
-            function dragended(event, d) {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
-        }
+    // Scroll to search results smoothly
+    searchResultsSection.scrollIntoView({ behavior: 'smooth' });
+  });
 
-        // Initialize all components when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            initMandalas();
-            initDeities();
-            initMantraExplorer();
-            createDeityNetwork();
-            
-            // Redraw network on window resize
-            window.addEventListener('resize', createDeityNetwork);
-        });
-    </script>
+</script>
+
 </body>
 </html>
+
